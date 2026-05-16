@@ -36,8 +36,12 @@ const config: QuartzConfig = {
       "CODE_OF_CONDUCT.md",
       "LICENSE.txt",
       "README.md",
-      // PASTA PRIVADA
+      // PASTA PRIVADA - VÁRIOS PATTERNS PARA GARANTIR EXCLUSÃO
+      "**/Prontuários/**",
+      "**/Prontuarios/**",
+      "TCC/Terapia Ocupacional/Prontuários/**",
       "TCC/Terapia Ocupacional/Prontuarios/**",
+      "**/Exemplos de Datasets*",
       // OS e editores
       ".DS_Store",
       "Thumbs.db",
