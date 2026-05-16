@@ -1,0 +1,72 @@
+name: Deploy Quartz site to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - content-updated
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      # 1. Checkout do docs_quartz (engine + config)
+      - name: Checkout docs_quartz
+        uses: actions/checkout@v4
+        with:
+          path: quartz-site
+          fetch-depth: 0
+
+      # 2. Checkout do Normans_Mind (conteúdo) - REPO PRIVADO, REQUER PAT
+      - name: Checkout content
+        uses: actions/checkout@v4
+        with:
+          repository: NormanFrieman/Normans_Mind
+          path: content
+          fetch-depth: 0
+          token: ${{ secrets.PAT }}
+
+      # 3. Setup Node
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: quartz-site/package-lock.json
+
+      # 4. Instalar dependências
+      - name: Install Dependencies
+        run: cd quartz-site && npm ci
+
+      # 5. Build Quartz (apontando para o checkout do conteúdo)
+      - name: Build Quartz
+        run: cd quartz-site && npx quartz build -d ../content
+
+      # 6. Upload artifact
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: quartz-site/public
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
