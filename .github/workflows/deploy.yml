@@ -38,7 +38,11 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT }}
 
-      # 3. Setup Node
+      # 3. Copiar index.md para raiz do conteúdo (página inicial)
+      - name: Copy index page
+        run: cp quartz-site/index.md content/index.md
+
+      # 4. Setup Node
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -46,15 +50,15 @@ jobs:
           cache: 'npm'
           cache-dependency-path: quartz-site/package-lock.json
 
-      # 4. Instalar dependências
+      # 5. Instalar dependências
       - name: Install Dependencies
         run: cd quartz-site && npm ci
 
-      # 5. Build Quartz (apontando para o checkout do conteúdo)
+      # 6. Build Quartz (apontando para o checkout do conteúdo)
       - name: Build Quartz
         run: cd quartz-site && npx quartz build -d ../content
 
-      # 6. Upload artifact
+      # 7. Upload artifact
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
